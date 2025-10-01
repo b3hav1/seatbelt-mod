@@ -12,7 +12,7 @@ public class ServerEvents
     @SubscribeEvent
     public static void onMount(EntityMountEvent event)
     {
-        // Если игрок на сервере находится в транспорте и собирается слезть.
+        // При попытке игрока на сервере слезть с маунта.
         if (event.getEntityMounting() instanceof Player player && event.isDismounting() && !player.level().isClientSide)
         Seatbelt.dismount(player, event);
     }

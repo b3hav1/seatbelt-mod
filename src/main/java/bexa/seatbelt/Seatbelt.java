@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.entity.EntityMountEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -27,9 +28,10 @@ public class Seatbelt
         bus.addListener(this::setup);
     }
 
-    // Создаем список для добавления пристегнутых игроков.
+    // Список пристегнутых игроков и флаг уведомления.
     private static final Map<UUID, Boolean> PLAYER_FASTENED = new ConcurrentHashMap<>();
-
+    private static boolean playerNotified = false;
+    
     /**
      * Регистрирует отправку пользовательских сетевых пакетов.
      * @param event - событие регистрации
@@ -46,7 +48,7 @@ public class Seatbelt
      */
     private static void displayHint(Player player, String key)
     {
-        player.displayClientMessage(Component.translatable("message." + MODID + "." + key), true);
+        player.displayClientMessage(Component.translatable("message.seatbelt." + key), true);
     }
 
     /**
@@ -67,11 +69,12 @@ public class Seatbelt
         // Сохраняем инвертированное состояние ремня.
         boolean state = !isFastened(player);
         PLAYER_FASTENED.put(player.getUUID(), state);
-
-        // Отображаем подсказку о ремне безопасности.
+        
+        // Проигрываем уведомление о ремне безопасности.
         displayHint(player, state ? "fasten" : "unfasten");
+        SoundUtils.onPlayer(player, state ? SoundEvents.ARMOR_EQUIP_LEATHER : SoundEvents.ARMOR_EQUIP_GENERIC);
     }
-
+    
     /**
      * Не позволяет игроку слезть с маунта, если он пристегнут.
      * @param player - игрок на сервере
@@ -81,9 +84,24 @@ public class Seatbelt
     {
         // Разрешаем слезть, если игрок не пристегнут.
         if (!isFastened(player)) return;
-
-        // Отменяем событие и отображаем подсказку.
+        
+        // Отменяем событие и проигрываем предупреждение.
         event.setCanceled(true);
         displayHint(player, "dismount");
+    }
+
+    /**
+     * Оповещает игрока при необходимости отстегнуть ремень.
+     * @param player - игрок на сервере
+     * @param dismount - его попытка слезть
+     */
+    public static void dismountNotify(Player player, boolean dismount)
+    {
+        // При нажатии клавиши, если игрок пристегнут.
+        if (dismount && !playerNotified && isFastened(player))
+        SoundUtils.onClient(player, SoundEvents.NOTE_BLOCK_HAT);
+    
+        // Инвертируем флаг уведомления.
+        playerNotified = dismount;
     }
 }

@@ -8,8 +8,6 @@ import net.minecraftforge.network.NetworkEvent;
 
 public class FastenPacket 
 {
-    public FastenPacket() {}
-
     public static void encode(FastenPacket packet, FriendlyByteBuf buffer) {}
 
     public static FastenPacket decode(FriendlyByteBuf buffer) { return new FastenPacket(); }

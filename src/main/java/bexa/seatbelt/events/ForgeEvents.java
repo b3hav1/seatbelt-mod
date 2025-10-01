@@ -13,6 +13,7 @@ public class ForgeEvents
     @SubscribeEvent
     public static void onKeyRegister(RegisterKeyMappingsEvent event)
     {
+        // Регистрируем клавиши на клиенте.
         event.register(Keybind.SEATBELT_KEY);
     }
 }
