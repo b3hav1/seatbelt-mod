@@ -17,11 +17,13 @@ public class FastenPacket
         NetworkEvent.Context ctx = provider.get();
         ctx.enqueueWork(() ->
         {
+            // Получаем отправителя пакета.
             Object sender = ctx.getSender();
             if (sender == null) return;
 
+            // Пристегиваем или отстегиваем отправителя.
             if (sender instanceof ServerPlayer player)
-            Seatbelt.fasten(player);
+            Seatbelt.toggle(player);
         });
 
         ctx.setPacketHandled(true);

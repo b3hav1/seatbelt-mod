@@ -30,8 +30,8 @@ public class Seatbelt
     }
 
     // Список пристегнутых игроков и флаг уведомления.
-    private static final Map<UUID, Boolean> PLAYER_FASTENED = new ConcurrentHashMap<>();
-    private static boolean playerNotified = false;
+    public static final Map<UUID, Boolean> PLAYER_FASTENED = new ConcurrentHashMap<>();
+    public static boolean playerNotified = false;
     
     /**
      * Регистрирует отправку пользовательских сетевых пакетов.
@@ -55,7 +55,7 @@ public class Seatbelt
      * Позволяет игроку управлять ремнем, если он на маунте.
      * @param player - игрок на сервере
      */
-    public static void fasten(Player player)
+    public static void toggle(Player player)
     {
         // Сохраняем инвертированное состояние ремня.
         boolean state = !isFastened(player);
@@ -64,6 +64,16 @@ public class Seatbelt
         // Проигрываем уведомление о ремне безопасности.
         Display.hint(player, state ? "fasten" : "unfasten");
         Sound.onServer(player, state ? SoundEvents.ARMOR_EQUIP_LEATHER : SoundEvents.ARMOR_EQUIP_GENERIC);
+    }
+
+    /**
+     * Сбрасывает состояние ремня безопасности игрока.
+     * @param player - игрок на сервере
+     */
+    public static void reset(Player player)
+    {
+        PLAYER_FASTENED.remove(player.getUUID());
+        playerNotified = false;
     }
     
     /**

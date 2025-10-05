@@ -10,6 +10,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputEvent.Key;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -38,7 +39,23 @@ public class PlayerEvents
         Minecraft game = Minecraft.getInstance();
         boolean sneaking = game.options.keyShift.isDown();
 
+        // Получаем игрока на клиенте майнкрафта.
+        Player player = Minecraft.getInstance().player;
+        if (player == null) return;
+
         // Оповещаем игрока при попытке слезть с маунта.
-        Seatbelt.dismountNotify(game.player, sneaking);
+        Seatbelt.dismountNotify(player, sneaking);
+
+        // Сбрасываем ремень при уничтожении маунта.
+        if (player.getVehicle() == null)
+        Seatbelt.reset(player);
+    }
+
+    @SubscribeEvent
+    public static void onPlayerDeath(LivingDeathEvent event)
+    {
+        // Сбрасываем ремень при смерти игрока.
+        if (event.getEntity() instanceof Player player)
+        Seatbelt.reset(player);
     }
 }
